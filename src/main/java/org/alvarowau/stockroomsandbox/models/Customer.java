@@ -23,7 +23,7 @@ public class Customer extends Person {
         // Constructor por defecto
     }
 
-    public Customer(String firstName, String lastName, int numberPhone, String email, String address, LocalDate birthDate,
+    public Customer(String firstName, String lastName, String numberPhone, String email, String address, LocalDate birthDate,
                     String gender, String personalId, String nationality,
                     String userName, String password, int loyaltyPoints, AccountStatus accountStatus,
                     LocalDateTime lastLoginDate, String preferredPaymentMethod, SubscriptionType subscriptionType,
@@ -41,7 +41,7 @@ public class Customer extends Person {
         this.purchaseHistory = purchaseHistory;
     }
 
-    public Customer(Integer idPerson, String firstName, String lastName, int numberPhone, String email, String address,
+    public Customer(Integer idPerson, String firstName, String lastName, String numberPhone, String email, String address,
                     LocalDate birthDate, String gender, String personalId, String nationality, LocalDate registrationDate,
                     String userName, String password, int loyaltyPoints, AccountStatus accountStatus,
                     LocalDateTime lastLoginDate, String preferredPaymentMethod, SubscriptionType subscriptionType,
@@ -147,6 +147,37 @@ public class Customer extends Person {
 
     public void setPurchaseHistory(List<Purchase> purchaseHistory) {
         this.purchaseHistory = purchaseHistory;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "Customer { idPerson=%d, firstName='%s', lastName='%s', numberPhone='%s', email='%s', address='%s', " +
+                        "birthDate=%s, gender='%s', personalId='%s', nationality='%s', registrationDate=%s, userName='%s', " +
+                        "password='[PROTECTED]', loyaltyPoints=%d, accountStatus=%s, lastLoginDate=%s, preferredPaymentMethod='%s', " +
+                        "subscriptionType=%s, shippingAddress='%s', billingAddress='%s', purchaseHistory=%s }",
+                getIdPerson(),                           // %d: Integer
+                getFirstName(),                         // %s: String
+                getLastName(),                          // %s: String
+                getNumberPhone(),                       // %s: String
+                getEmail(),                             // %s: String
+                getAddress(),                           // %s: String
+                getBirthDate(),                         // %s: LocalDate
+                getGender(),                            // %s: String
+                getPersonalId(),                        // %s: String
+                getNationality(),                       // %s: String
+                getRegistrationDate(),                  // %s: LocalDate
+                getUserName(),                          // %s: String
+                // Password is masked
+                getLoyaltyPoints(),                     // %d: Integer
+                getAccountStatus(),                     // %s: Enum
+                getLastLoginDate(),                     // %s: LocalDateTime
+                getPreferredPaymentMethod(),            // %s: String
+                getSubscriptionType(),                  // %s: Enum
+                getShippingAddress(),                   // %s: String
+                getBillingAddress(),                    // %s: String
+                getPurchaseHistory() != null ? getPurchaseHistory().toString() : "null" // %s: List or null
+        );
     }
 
 

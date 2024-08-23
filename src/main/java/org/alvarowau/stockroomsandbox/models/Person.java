@@ -9,7 +9,7 @@ public class Person implements Comparable<Person>{
     private Integer idPerson;
     private String firstName;
     private String lastName;
-    private int numberPhone;
+    private String numberPhone;
     private String email;
     private String address;
     private LocalDate birthDate;
@@ -19,7 +19,7 @@ public class Person implements Comparable<Person>{
     private LocalDate registrationDate;
 
 
-    public Person(Integer idPerson, String firstName, String lastName, int numberPhone, String email,
+    public Person(Integer idPerson, String firstName, String lastName, String numberPhone, String email,
                   String address, LocalDate birthDate, String gender, String personalId,
                   String nationality, LocalDate registrationDate) {
         this.idPerson = idPerson;
@@ -38,13 +38,13 @@ public class Person implements Comparable<Person>{
     public Person() {
     }
 
-    public Person(Integer idPerson, String firstName, String lastName, int numberPhone, String email, String address,
+    public Person(Integer idPerson, String firstName, String lastName, String numberPhone, String email, String address,
                   LocalDate birthDate, String gender, String personalId, String nationality){
         this(firstName,lastName,numberPhone,email,address,birthDate,gender,personalId,nationality);
         this.idPerson = idPerson;
     }
 
-    public Person(String firstName, String lastName, int numberPhone, String email, String address, LocalDate birthDate, String gender, String personalId, String nationality) {
+    public Person(String firstName, String lastName, String numberPhone, String email, String address, LocalDate birthDate, String gender, String personalId, String nationality) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.numberPhone = numberPhone;
@@ -80,11 +80,11 @@ public class Person implements Comparable<Person>{
         this.lastName = lastName;
     }
 
-    public int getNumberPhone() {
+    public String getNumberPhone() {
         return numberPhone;
     }
 
-    public void setNumberPhone(int numberPhone) {
+    public void setNumberPhone(String numberPhone) {
         this.numberPhone = numberPhone;
     }
 

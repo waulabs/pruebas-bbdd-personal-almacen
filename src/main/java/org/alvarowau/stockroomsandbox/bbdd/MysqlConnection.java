@@ -1,45 +1,42 @@
 package org.alvarowau.stockroomsandbox.bbdd;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MysqlConnection {
 
-    private Connection connection;
+    private static HikariDataSource dataSource;
 
-    private static final String URL = "jdbc:mysql://localhost:3306/prueba-store";  // Database URL
-    private static final String USER = "root";  // Database user
-    private static final String PASSWORD = "";  // Database password
+    static {
+        // Configura el pool de conexiones HikariCP
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/prueba-store");
+        config.setUsername("root");
+        config.setPassword("root");
 
-    public MysqlConnection() {
-        try {
-            connection = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Database connection established successfully.");
-        } catch (SQLException e) {
-            printSQLExceptionDetails(e);
+        // Opcional: Configuraciones adicionales
+        config.setMaximumPoolSize(10); // Número máximo de conexiones en el pool
+        config.setMinimumIdle(5); // Número mínimo de conexiones inactivas
+        config.setIdleTimeout(30000); // Tiempo máximo que una conexión puede estar inactiva
+        config.setConnectionTimeout(30000); // Tiempo máximo de espera para obtener una conexión
+
+        // Inicializa el datasource
+        dataSource = new HikariDataSource(config);
+        System.out.println("Database connection pool established successfully.");
+    }
+
+    public Connection getDatabaseConnection() throws SQLException {
+        // Devuelve una conexión del pool
+        return dataSource.getConnection();
+    }
+
+    public void close() {
+        if (dataSource != null) {
+            dataSource.close();
+            System.out.println("Database connection pool closed successfully.");
         }
     }
-
-    public Connection getDatabaseConnection() {
-        return connection;
-    }
-
-    public void closeDatabaseConnection() {
-        try {
-            if (connection != null) {
-                connection.close();
-                System.out.println("Database connection closed successfully.");
-            }
-        } catch (SQLException e) {
-            printSQLExceptionDetails(e);
-        }
-    }
-
-    private void printSQLExceptionDetails(SQLException e) {
-        System.out.println("Error Code: " + e.getErrorCode());
-        System.out.println("Cause: " + e.getCause());
-        System.out.println("Message: " + e.getMessage());
-    }
-
 }

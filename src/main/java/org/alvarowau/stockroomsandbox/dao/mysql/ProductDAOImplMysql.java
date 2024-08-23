@@ -12,15 +12,16 @@ public class ProductDAOImplMysql implements ProductDAO {
 
     private final MysqlConnection mysql;
 
-    public ProductDAOImplMysql(){
-        mysql = new MysqlConnection();
+    public ProductDAOImplMysql() {
+        mysql = new MysqlConnection(); // Asumiendo que MysqlConnection está configurado para usar HikariCP
     }
 
     @Override
     public Product save(Product entity) {
-        try (Connection connection = mysql.getDatabaseConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    SqlQueriesMysql.PRODUCT_INSERT, Statement.RETURN_GENERATED_KEYS);
+        String sql = SqlQueriesMysql.PRODUCT_INSERT;
+        try (Connection connection = mysql.getDatabaseConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             preparedStatement.setString(1, entity.getCode());
             preparedStatement.setString(2, entity.getName());
             preparedStatement.setString(3, entity.getDescription());
@@ -41,14 +42,15 @@ public class ProductDAOImplMysql implements ProductDAO {
         } catch (SQLException e) {
             handleSQLException(e);
         }
-
         return entity;
     }
 
     @Override
     public boolean update(Product entity) {
-        try (Connection connection = mysql.getDatabaseConnection()) {
-            PreparedStatement statement = connection.prepareStatement(SqlQueriesMysql.PRODUCT_UPDATE);
+        String sql = SqlQueriesMysql.PRODUCT_UPDATE;
+        try (Connection connection = mysql.getDatabaseConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
             statement.setString(1, entity.getCode());
             statement.setString(2, entity.getName());
             statement.setString(3, entity.getDescription());
@@ -67,8 +69,10 @@ public class ProductDAOImplMysql implements ProductDAO {
 
     @Override
     public boolean delete(Integer id) {
-        try (Connection connection = mysql.getDatabaseConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SqlQueriesMysql.PRODUCT_DELETE);
+        String sql = SqlQueriesMysql.PRODUCT_DELETE;
+        try (Connection connection = mysql.getDatabaseConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
             preparedStatement.setInt(1, id);
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
@@ -81,14 +85,15 @@ public class ProductDAOImplMysql implements ProductDAO {
     @Override
     public Product findById(Integer id) {
         Product product = null;
+        String sql = SqlQueriesMysql.PRODUCT_SELECT_BY_ID;
+        try (Connection connection = mysql.getDatabaseConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
-        try (Connection connection = mysql.getDatabaseConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SqlQueriesMysql.PRODUCT_SELECT_BY_ID);
             preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            if (resultSet.next()) {
-                product = createProductFromResultSet(resultSet);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    product = createProductFromResultSet(resultSet);
+                }
             }
         } catch (SQLException e) {
             handleSQLException(e);
@@ -99,9 +104,10 @@ public class ProductDAOImplMysql implements ProductDAO {
     @Override
     public List<Product> findAll() {
         List<Product> products = new ArrayList<>();
-        try (Connection connection = mysql.getDatabaseConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(SqlQueriesMysql.PRODUCT_SELECT_ALL);
-            ResultSet resultSet = preparedStatement.executeQuery();
+        String sql = SqlQueriesMysql.PRODUCT_SELECT_ALL;
+        try (Connection connection = mysql.getDatabaseConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
                 Product product = createProductFromResultSet(resultSet);
@@ -113,21 +119,22 @@ public class ProductDAOImplMysql implements ProductDAO {
         return products;
     }
 
-    private Product createProductFromResultSet(ResultSet set) throws SQLException {
+    private Product createProductFromResultSet(ResultSet resultSet) throws SQLException {
         return new Product(
-                set.getInt("idProduct"),
-                set.getString("code"),
-                set.getString("name"),
-                set.getString("description"),
-                set.getInt("stock"),
-                set.getBoolean("status"),
-                set.getDouble("price")
+                resultSet.getInt("idProduct"),
+                resultSet.getString("code"),
+                resultSet.getString("name"),
+                resultSet.getString("description"),
+                resultSet.getInt("stock"),
+                resultSet.getBoolean("status"),
+                resultSet.getDouble("price")
         );
     }
 
     private void handleSQLException(SQLException e) {
-        System.out.println("Error Code: " + e.getErrorCode());
-        System.out.println("Cause: " + e.getCause());
-        System.out.println("Message: " + e.getMessage());
+        System.err.println("SQL Error Code: " + e.getErrorCode());
+        System.err.println("SQL State: " + e.getSQLState());
+        System.err.println("Message: " + e.getMessage());
+        e.printStackTrace();
     }
 }
